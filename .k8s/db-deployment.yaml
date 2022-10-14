@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  labels:
+    db: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      db: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        db: postgres
+    spec:
+      containers:
+        - name: db
+          image: postgres:14
+          env:
+            - name: POSTGRES_PASSWORD
+              value: strongpassword
+            - name: POSTGRES_USER
+              value: vstorozhenko
+          ports:
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: db-volume
+      restartPolicy: Always
+      volumes:
+        - name: db-volume
+          hostPath:
+            path: /Users/vstorozhenko/PycharmProjects/FastApiProject/db_data

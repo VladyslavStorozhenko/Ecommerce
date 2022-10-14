@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  app:
+    image: vstorozhenko/ecommerce-app:1.0
+    build:
+      context: .
+      dockerfile: ./ecommerce/Dockerfile
+    command: bash -c "alembic upgrade head && python ecommerce/main.py"
+    environment:
+      DOCKER_DB_HOST: db # should match name of database service
+      DOCKER_REDIS_HOST: redis # should match name of redis service
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./ecommerce:/app/ecommerce"
+    networks:
+      - ecommerce_network
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14
+    environment: # should match definitions in ecommerce/config.py
+      POSTGRES_USER: vstorozhenko # db name will be the same
+      POSTGRES_PASSWORD: strongpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - "db-volume:/var/lib/postgresql/data"
+    networks:
+      - ecommerce_network
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    networks:
+      - ecommerce_network
+
+volumes:
+  db-volume:
+
+networks:
+  ecommerce_network:

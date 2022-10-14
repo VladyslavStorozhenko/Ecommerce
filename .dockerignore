@@ -1,0 +1,5 @@
+.git
+.pytest_cache
+ecommerce/Dockerfile
+venv
+docker-compose.yml
